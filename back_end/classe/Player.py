@@ -7,20 +7,26 @@ class Player(Character):
         self.intelligence = intelligence
         self.items = []
 
-        def attack(self, enemy):
-            print("You attack the enemy!")
+    def attack(self, enemy):
+        return True
 
-        def defence(self, enemy):
-            print("You defend yourself!")
+    def defence(self, enemy):
+        return True
 
-        def escape(self, enemy):
-            print("You try to escape!")
+    def escape(self, enemy):
+        return True
 
-        def is_dead(self):
-            return self.health <= 0
+    def is_dead(self):
+        return self.health <= 0
 
-        def add_item(self, item):
-            self.items.append(item)
+    def add_item(self, item):
+        self.items.append(item)
 
-        def use_item(self):
-            pass
+    def use_item(self,):
+        pass
+
+    def has_item(self, itemName):
+        return self.find_item(itemName) != None
+
+    def find_item(self, itemName):
+        return None
