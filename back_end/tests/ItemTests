@@ -1,0 +1,12 @@
+class TestItemClasses(unittest.TestCase):
+
+    def test_sword_use(self):
+        sword = SwordClass()
+        self.assertEqual(sword.use(), 10)
+
+    def test_potion_use(self):
+        potion = PotionClass()
+        self.assertEqual(potion.health, 10)
+
+if __name__ == '__main__':
+    unittest.main()
