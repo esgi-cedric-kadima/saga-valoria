@@ -33,12 +33,10 @@ class PlayerTest(unittest.TestCase):
         self.assertEqual(self.player.health, 75)
         self.assertFalse(self.player.is_dead())
 
-
     def test_character_defence_died(self):
         self.player.health = 1
         self.assertFalse(self.player.defence(self.strongEnemy))
         self.assertTrue(self.player.is_dead())
-
 
     def test_character_escape_success(self):
         self.assertTrue(self.player.escape(self.strongEnemy))
@@ -63,7 +61,6 @@ class PlayerTest(unittest.TestCase):
 
         self.assertEqual(self.player.items[0].name, items[0].name)
         self.assertEqual(self.player.items, items)
-
 
     def test_character_use_item(self):
         swordItem = SwordItem("Excalibur", 10)
