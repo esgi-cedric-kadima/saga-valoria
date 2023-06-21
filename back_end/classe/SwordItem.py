@@ -1,23 +1,10 @@
-from ItemClass import ItemClass
-from PlayerClass import Player
-from EnemyClass import Enemy
-class SwordItemClass(ItemClass):
+from classe.Item import AbstractItem
+from classe.Player import Player
+class SwordItem(AbstractItem):
 
-    def __init__(self, name, damage, durability):
+    def __init__(self, name, strength):
         super().__init__(name)
-        self.damage = damage
-        self.durability = durability
+        self.strength = strength
 
-    def use(self, character, enemy):
-        if(self.usable()):
-            if(character.strength + self.damage > enemy.strength):
-                self.durability -= 1
-                return True
-            self.durability -= 1
-            return False
-        return False
-
-    def usable(self):
-        if(self.durability > 0):
-            return True
-        return False
+    def use(self, character):
+        character.strength += self.strength
