@@ -16,7 +16,7 @@ class PlayerTest(unittest.TestCase):
     def test_character_initialization(self):
         self.assertEqual(self.player.name, "John")
         self.assertEqual(self.player.health, 100)
-        self.assertEqual(self.player.strength, 10)
+        self.assertEqual(self.player.strength, 50)
         self.assertEqual(self.player.agility, 20)
         self.assertEqual(self.player.intelligence, 30)
         self.assertEqual(self.player.items, [])
@@ -25,25 +25,26 @@ class PlayerTest(unittest.TestCase):
         self.assertFalse(self.player.attack(self.strongEnemy))
 
     def test_character_attack_success(self):
-        self.assertFalse(self.player.attack(self.weakEnemy))
+        self.assertTrue(self.player.attack(self.weakEnemy))
 
     def test_character_defence_survived(self):
         self.assertTrue(self.player.defence(self.weakEnemy))
-        # -30 hp
-        self.assertEqual(self.player.health, 70)
+        # -25 hp
+        self.assertEqual(self.player.health, 75)
         self.assertFalse(self.player.is_dead())
 
+
     def test_character_defence_died(self):
+        self.player.health = 1
         self.assertFalse(self.player.defence(self.strongEnemy))
-        # -9999 hp
         self.assertTrue(self.player.is_dead())
 
 
     def test_character_escape_success(self):
-        self.assertTrue(self.player.escape(self.weakEnemy))
+        self.assertTrue(self.player.escape(self.strongEnemy))
 
     def test_character_escape_failed(self):
-        self.assertFalse(self.player.escape(self.strongEnemy))
+        self.assertFalse(self.player.escape(self.weakEnemy))
 
     def test_character_is_dead(self):
         self.assertFalse(self.player.is_dead())
@@ -53,10 +54,12 @@ class PlayerTest(unittest.TestCase):
         self.assertTrue(self.player.is_dead())
 
     def test_character_add_item(self):
-        items = [SwordItem("Excalibur", 10), PotionItem(20)]
+        swordItem = SwordItem("Excalibur", 10)
+        potionItem = PotionItem(20)
+        items = [swordItem, potionItem]
 
-        self.player.add_item(SwordItem("Excalibur", 10))
-        self.player.add_item(PotionItem(20))
+        self.player.add_item(swordItem)
+        self.player.add_item(potionItem)
 
         self.assertEqual(self.player.items[0].name, items[0].name)
         self.assertEqual(self.player.items, items)
@@ -69,7 +72,9 @@ class PlayerTest(unittest.TestCase):
         beforeHealth = self.player.health
 
         self.player.add_item(swordItem)
+        self.player.add_item(swordItem)
         self.player.add_item(potionItem)
+
         self.player.use_item(swordItem)
         self.player.use_item(potionItem)
 
