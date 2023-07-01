@@ -6,9 +6,23 @@ websocket.addEventListener('open', function (event) {
     // La connexion WebSocket est ouverte avec succès
     console.log('WebSocket connection established.');
 
+    const messageStart = {
+        action: "start",
+    };
     // Envoyer un message au serveur
-    const message = "start";
-    websocket.send(message);
+    websocket.send(JSON.stringify(messageStart));
+
+    const messageMove = {
+        action: "move",
+        direction: "up",
+    };
+    websocket.send(JSON.stringify(messageMove));
+
+    const messageEventChoice = {
+        action: "handle_event",
+        choice: "attack",
+    };
+    websocket.send(JSON.stringify(messageEventChoice));
 });
 
 // Gestionnaire d'événement pour la réception de messages du serveur

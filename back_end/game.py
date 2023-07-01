@@ -118,7 +118,7 @@ async def handle_event(websocket, action):
         return
 
     if player.is_dead():
-        await websocket.send(json.dumps({"state": DEAD, "error": "Vous êtes mort"}))
+        await websocket.send(json.dumps({"player": player.convert_to_dict(), "state": DEAD, "error": "Vous êtes mort"}))
         return
 
     event = map.grid[current_position[0]][current_position[1]]  # Événement sur la case actuelle du joueur
@@ -140,27 +140,26 @@ async def handle_event(websocket, action):
             message = "Vous avez fui " + event.name + " mais il vous a tué."
 
     if(player.is_dead()):
-        await websocket.send(json.dumps({"state": DEAD, "message": message}))
+        await websocket.send(json.dumps({"player": player.convert_to_dict(), "state": DEAD, "message": message}))
     else:
-        await websocket.send(json.dumps({"state": ALIVE, "message": message}))
+        await websocket.send(json.dumps({"player": player.convert_to_dict(), "state": ALIVE, "message": message}))
 
 async def handler(websocket):
     """
     Gestionnaire principal des messages reçus par le serveur WebSocket.
     """
     async for message in websocket:
-        if message == "start":
+        data = json.loads(message)
+        if data['action'] == "start":
             initialize_game()
             print('Game initialized')
             await websocket.send(json.dumps({"player": player.convert_to_dict(), "map": map.convert_to_dict()}))
-        elif message == "move":
-            data = json.loads(message)
+        elif data['action'] == "move":
             direction = data["direction"]
             await handle_move(websocket, direction)
-        elif message == "handle_event":
-            data = json.loads(message)
-            action = data["action"]
-            await handle_event(websocket, action)
+        elif data['action'] == "handle_event":
+            choice = data["choice"]
+            await handle_event(websocket, choice)
 
 async def main():
     async with websockets.serve(handler, "", 8001):
