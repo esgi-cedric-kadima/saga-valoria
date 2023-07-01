@@ -55,11 +55,11 @@ async def handle_move(websocket, direction):
     global current_position
 
     if player is None:
-        await websocket.send(json.dumps({"error": "Le jeu n'a pas été initialisé"}))
+        await websocket.send({"error": "Le jeu n'a pas été initialisé"})
         return
 
     if player.is_dead():
-        await websocket.send(json.dumps({"state": DEAD, "error": "Vous êtes mort"}))
+        await websocket.send({"state": DEAD, "error": "Vous êtes mort"})
         return
 
     end_position = (map_size[0] - 1, map_size[1] - 1)  # Position finale de la carte
@@ -74,7 +74,7 @@ async def handle_move(websocket, direction):
 
     # Vérifie si la direction spécifiée est valide
     if direction not in adjacent_moves:
-        await websocket.send(json.dumps({"error": "Direction invalide"}))
+        await websocket.send({"error": "Direction invalide"})
         return
 
     # Coordonnées du déplacement adjacent
@@ -88,7 +88,7 @@ async def handle_move(websocket, direction):
         or new_position[1] < 0
         or new_position[1] >= map_size[1]
     ):
-        await websocket.send(json.dumps({"error": "Déplacement en dehors de la carte"}))
+        await websocket.send({"error": "Déplacement en dehors de la carte"})
         return
 
     current_position = new_position  # Met à jour la position actuelle du joueur
@@ -105,20 +105,20 @@ async def handle_move(websocket, direction):
 
     # Vérifie si le joueur a atteint la position finale de la carte sans être mort
     if current_position == end_position and not player.is_dead():
-        await websocket.send(json.dumps({"state": WIN, "message": "Victoire !"}))
+        await websocket.send({"state": WIN, "message": "Victoire !"})
         return
-    await websocket.send(json.dumps({"player": player.__dict__, "message": message, "state": ALIVE}))
+    await websocket.send({"player": player.__dict__, "message": message, "state": ALIVE})
 
 async def handle_event(websocket, action):
     """
     Gère les actions du joueur en réponse à un événement rencontré.
     """
     if player is None:
-        await websocket.send(json.dumps({"error": "Le jeu n'a pas été initialisé"}))
+        await websocket.send({"error": "Le jeu n'a pas été initialisé"})
         return
 
     if player.is_dead():
-        await websocket.send(json.dumps({"state": DEAD, "error": "Vous êtes mort"}))
+        await websocket.send({"state": DEAD, "error": "Vous êtes mort"})
         return
 
     event = map.grid[current_position[0]][current_position[1]]  # Événement sur la case actuelle du joueur
@@ -142,9 +142,9 @@ async def handle_event(websocket, action):
     print(player.__dict__)
 
     if(player.is_dead()):
-        await websocket.send(json.dumps({"state": DEAD, "message": message}))
+        await websocket.send({"state": DEAD, "message": message})
     else:
-        await websocket.send(json.dumps({"state": ALIVE, "message": message}))
+        await websocket.send({"state": ALIVE, "message": message})
 
 async def handler(websocket):
     """
@@ -154,7 +154,7 @@ async def handler(websocket):
         if message == "start":
             initializeGame()
             print('Game initialized')
-            await websocket.send(json.dumps({"player": player.__dict__, "map": map.__dict__}))
+            await websocket.send({"player": player.__dict__, "map": map.__dict__})
         elif message == "move":
             data = json.loads(message)
             direction = data["direction"]
