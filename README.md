@@ -5,3 +5,10 @@ Jeu RPG Tour partout  On joue un aventurier qui doit traverser un donjon, à cha
 - [X] Python 3.11
 - Python packages to install not in the standard library:
   - [X] Websockets -> `pip install websockets`
+
+# Back-end test
+- Start server before test,
+- cd back-end
+- python game.py
+- cd tests
+- python -m unittest
