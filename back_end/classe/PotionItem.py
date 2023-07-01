@@ -21,3 +21,12 @@ class PotionItem(AbstractItem):
         Ajoute la quantité de santé de la potion à la santé du personnage.
         """
         character.health += self.health
+
+    def convert_to_dict(self):
+        """
+        Convertit la potion en dictionnaire.
+        """
+        return {
+            "name": self.name,
+            "health": self.health,
+        }

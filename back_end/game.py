@@ -22,7 +22,7 @@ map = None  # Instance de la classe Map
 player = None  # Instance de la classe Player
 current_position = None # Position actuelle du joueur
 
-def initializeGame():
+def initialize_game():
     """
     Initialise le jeu en créant une carte, un joueur et des événements possibles sur la carte.
     """
@@ -105,9 +105,9 @@ async def handle_move(websocket, direction):
 
     # Vérifie si le joueur a atteint la position finale de la carte sans être mort
     if current_position == end_position and not player.is_dead():
-        await websocket.send(json.dumps({"state": WIN, "message": "Victoire !"}))
+        await websocket.send(json.dumps({"state": WIN, "message": "Victoire !"})
         return
-    await websocket.send(json.dumps({"player": player.__dict__, "message": message, "state": ALIVE}))
+    await websocket.send(json.dumps({"player": player.convert_to_dict(), "message": message, "state": ALIVE}))
 
 async def handle_event(websocket, action):
     """
@@ -152,9 +152,9 @@ async def handler(websocket):
     """
     async for message in websocket:
         if message == "start":
-            initializeGame()
+            initialize_game()
             print('Game initialized')
-            await websocket.send(json.dumps({"player": player.__dict__, "map": map.__dict__}))
+            await websocket.send(json.dumps({"player": player.convert_to_dict(), "map": map.convert_to_dict()}))
         elif message == "move":
             data = json.loads(message)
             direction = data["direction"]

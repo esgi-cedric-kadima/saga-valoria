@@ -29,3 +29,13 @@ class Map:
                     self.grid[line][column] = None
                 else:
                     self.grid[line][column] = random.choice(events)
+
+    def convert_to_dict(self):
+        """
+        Convertit l'objet en dictionnaire.
+        """
+        return {
+            'lines': len(self.grid),
+            'columns': len(self.grid[0]) if self.grid else 0,
+            'grid': [[event.convert_to_dict() if event else None for event in line] for line in self.grid] if self.grid else ''
+        }

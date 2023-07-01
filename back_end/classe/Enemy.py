@@ -11,3 +11,13 @@ class Enemy(Character):
         Initialise un ennemi avec un nom, une force et une agilité données.
         """
         super().__init__(name, strength, agility)
+
+    def convert_to_dict(self):
+        """
+        Convertit l'ennemi en dictionnaire.
+        """
+        return {
+            "name": self.name,
+            "strength": self.strength,
+            "agility": self.agility,
+        }

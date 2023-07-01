@@ -10,7 +10,9 @@ websocket.addEventListener('open', function(event) {
 
 websocket.addEventListener('message', function(event) {
     const message = event.data;
-    console.log('Received from server:', message);
+    const data = JSON.parse(message);
+
+    console.log('Received from server:', data);
 });
 
 websocket.addEventListener('close', function(event) {

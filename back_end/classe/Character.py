@@ -10,3 +10,11 @@ class Character:
         self.name = name
         self.strength = strength
         self.agility = agility
+
+    def convert_to_dict(self):
+        """
+        Convertit le personnage en dictionnaire.
+        """
+        return {
+            "name": self.name,
+        }

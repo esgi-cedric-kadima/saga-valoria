@@ -22,3 +22,12 @@ class AbstractItem:
         Doit être implémentée par les sous-classes.
         """
         pass
+
+    def convert_to_dict(self):
+        """
+        Convertit l'objet en dictionnaire.
+        """
+        return {
+            "name": self.name,
+        }
+

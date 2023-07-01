@@ -89,3 +89,16 @@ class Player(Character):
             if self.items[i].name == itemName:
                 return i
         return None
+
+    def convert_to_dict(self):
+        """
+        Convertit l'objet en dictionnaire.
+        """
+        return {
+            'name': self.name,
+            'health': self.health,
+            'strength': self.strength,
+            'agility': self.agility,
+            'intelligence': self.intelligence,
+            'items': [item.convert_to_dict() for item in self.items]
+        }

@@ -21,3 +21,12 @@ class SwordItem(AbstractItem):
         Ajoute la force de l'épée à la force du personnage.
         """
         character.strength += self.strength
+
+    def convert_to_dict(self):
+        """
+        Convertit l'épée en dictionnaire.
+        """
+        return {
+            "name": self.name,
+            "strength": self.strength,
+        }
