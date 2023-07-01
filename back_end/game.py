@@ -20,8 +20,8 @@ DEAD = 0
 map_size = None  # Taille de la carte
 map = None  # Instance de la classe Map
 player = None  # Instance de la classe Player
-current_position = None # Position actuelle du joueur
-end_position = None # Position finale de la carte
+current_position = None  # Position actuelle du joueur
+end_position = None  # Position finale de la carte
 
 def initialize_game():
     """
@@ -61,7 +61,7 @@ async def handle_move(websocket, direction):
         return
 
     if player.is_dead():
-        await websocket.send(json.dumps({"state": DEAD, "error": "Vous êtes mort"}))
+        await websocket.send(json.dumps({"result_move": {"state": DEAD, "error": "Vous êtes mort"}}))
         return
 
     # Coordonnées du déplacement adjacent
@@ -74,7 +74,7 @@ async def handle_move(websocket, direction):
 
     # Vérifie si la direction spécifiée est valide
     if direction not in adjacent_moves:
-        await websocket.send(json.dumps({"error": "Direction invalide"}))
+        await websocket.send(json.dumps({"result_move": {"error": "Direction invalide"}}))
         return
 
     # Coordonnées du déplacement adjacent
@@ -88,7 +88,7 @@ async def handle_move(websocket, direction):
         or new_position[1] < 0
         or new_position[1] >= map_size[1]
     ):
-        await websocket.send(json.dumps({"error": "Déplacement en dehors de la carte"}))
+        await websocket.send(json.dumps({"result_move": {"error": "Déplacement en dehors de la carte"}}))
         return
 
     current_position = new_position  # Met à jour la position actuelle du joueur
@@ -105,9 +105,9 @@ async def handle_move(websocket, direction):
 
     # Vérifie si le joueur a atteint la position finale de la carte sans être mort
     if current_position == end_position and not player.is_dead():
-        await websocket.send(json.dumps({"state": WIN, "message": "Victoire !"}))
+        await websocket.send(json.dumps({"result_move": {"state": WIN, "message": "Victoire !"}}))
         return
-    await websocket.send(json.dumps({"player": player.convert_to_dict(), "message": message, "state": ALIVE}))
+    await websocket.send(json.dumps({"result_move": {"player": player.convert_to_dict(), "message": message, "state": ALIVE}}))
 
 async def handle_event(websocket, action):
     """
@@ -118,7 +118,7 @@ async def handle_event(websocket, action):
         return
 
     if player.is_dead():
-        await websocket.send(json.dumps({"player": player.convert_to_dict(), "state": DEAD, "error": "Vous êtes mort"}))
+        await websocket.send(json.dumps({"result_event_action": {"player": player.convert_to_dict(), "state": DEAD, "error": "Vous êtes mort"}}))
         return
 
     event = map.grid[current_position[0]][current_position[1]]  # Événement sur la case actuelle du joueur
@@ -139,10 +139,10 @@ async def handle_event(websocket, action):
         else:
             message = "Vous avez fui " + event.name + " mais il vous a tué."
 
-    if(player.is_dead()):
-        await websocket.send(json.dumps({"player": player.convert_to_dict(), "state": DEAD, "message": message}))
+    if player.is_dead():
+        await websocket.send(json.dumps({"result_event_action": {"player": player.convert_to_dict(), "state": DEAD, "message": message}}))
     else:
-        await websocket.send(json.dumps({"player": player.convert_to_dict(), "state": ALIVE, "message": message}))
+        await websocket.send(json.dumps({"result_event_action": {"player": player.convert_to_dict(), "state": ALIVE, "message": message}}))
 
 async def handler(websocket):
     """
@@ -153,7 +153,7 @@ async def handler(websocket):
         if data['action'] == "start":
             initialize_game()
             print('Game initialized')
-            await websocket.send(json.dumps({"player": player.convert_to_dict(), "map": map.convert_to_dict(), "exit": {"line": end_position[0], "column": end_position[1]}}))
+            await websocket.send(json.dumps({"result_game_start": {"player": player.convert_to_dict(), "map": map.convert_to_dict(), "exit": {"line": end_position[0], "column": end_position[1]}}}))
         elif data['action'] == "move":
             direction = data["direction"]
             await handle_move(websocket, direction)
