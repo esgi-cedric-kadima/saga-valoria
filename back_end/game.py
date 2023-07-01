@@ -153,7 +153,7 @@ async def handler(websocket):
         if data['action'] == "start":
             initialize_game()
             print('Game initialized')
-            await websocket.send(json.dumps({"result_game_start": {"player": player.convert_to_dict(), "map": map.convert_to_dict(), "exit": {"line": end_position[0], "column": end_position[1]}}}))
+            await websocket.send(json.dumps({"result_game_start": {"player": player.convert_to_dict(), "game_map": map.convert_to_dict(), "exit": {"line": end_position[0], "column": end_position[1]}}}))
         elif data['action'] == "move":
             direction = data["direction"]
             await handle_move(websocket, direction)
