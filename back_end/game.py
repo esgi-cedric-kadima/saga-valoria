@@ -105,7 +105,7 @@ async def handle_move(websocket, direction):
 
     # Vérifie si le joueur a atteint la position finale de la carte sans être mort
     if current_position == end_position and not player.is_dead():
-        await websocket.send(json.dumps({"state": WIN, "message": "Victoire !"})
+        await websocket.send(json.dumps({"state": WIN, "message": "Victoire !"}))
         return
     await websocket.send(json.dumps({"player": player.convert_to_dict(), "message": message, "state": ALIVE}))
 
