@@ -28,6 +28,7 @@ class AbstractItem:
         Convertit l'objet en dictionnaire.
         """
         return {
+            "class": self.__class__.__name__,
             "name": self.name,
         }
 

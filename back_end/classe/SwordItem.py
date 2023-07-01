@@ -27,6 +27,7 @@ class SwordItem(AbstractItem):
         Convertit l'épée en dictionnaire.
         """
         return {
+            "class": self.__class__.__name__,
             "name": self.name,
             "strength": self.strength,
         }

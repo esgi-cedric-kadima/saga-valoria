@@ -17,6 +17,7 @@ class Enemy(Character):
         Convertit l'ennemi en dictionnaire.
         """
         return {
+            "class": self.__class__.__name__,
             "name": self.name,
             "strength": self.strength,
             "agility": self.agility,
