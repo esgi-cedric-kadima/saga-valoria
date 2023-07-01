@@ -52,13 +52,15 @@ async def handle_move(websocket, direction):
         player.use_item(event)
         message = "Vous avez trouvé un objet : " + event.name + " et vous l'avez utilisé."
     elif isinstance(event, Enemy):
+        message = "Vous avez rencontré un ennemi : " + event.name + "." + " Que voulez-vous faire ?"
     elif event is None:
+        message = "Vous avez avancé sans encombre."
 
     if current_position == end_position and not player.is_dead():
         await websocket.send(json.dumps({"state": WIN, "message": "Victoire !"}))
         return
 
-    await websocket.send(json.dumps(player.__dict__))
+    await websocket.send(json.dumps( "player": player.__dict__, "message": message, "state": ALIVE))
 
 async def handle_event(websocket, action):
     if player is None:
@@ -96,7 +98,7 @@ async def handler(websocket):
             data = json.loads(message)
             direction = data["direction"]
             await handle_move(websocket, direction)
-         elif message == "handle_event":
+        elif message == "handle_event":
             data = json.loads(message)
             action = data["action"]
             await handle_event(websocket, action)
