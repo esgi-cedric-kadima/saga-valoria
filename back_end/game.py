@@ -16,26 +16,47 @@ WIN = 2
 ALIVE = 1
 DEAD = 0
 
-map_size = NONE
-map = None
-player = None
+map_size = None  # Taille de la carte
+map = None  # Instance de la classe Map
+player = None  # Instance de la classe Player
 
 def initializeGame():
-    map_size = (10, 10)
-    map = Map(map_size[0], map_size[1])
-    player = Player("Joueur", 100, 10, 10, 10)  # Exemple : un joueur avec 100 de santé et 10 de force, agilité et intelligence
+    """
+    Initialise le jeu en créant une carte, un joueur et des événements possibles sur la carte.
+    """
+    global map_size, map, player  # Utilise les variables globales
+
+    map_size = (10, 10)  # Définit la taille de la carte
+    map = Map(map_size[0], map_size[1])  # Crée une instance de la classe Map avec la taille spécifiée
+    player = Player("Joueur", 100, 10, 10, 10)  # Crée une instance de la classe Player avec des caractéristiques prédéfinies
+
     # Liste des événements possibles sur la carte
-    events = [None, None, PotionItem(20), SwordItem("Épée normal", 25), SwordItem("Excalibur", 999), Enemy("Blind dragon", 200, 0), Enemy("Dragon", 200, 50), Enemy("Gobelin", 15, 5), Enemy("Gobelin", 15, 5)]
-    map.populate(events)  # On place les événements sur la carte
+    events = [
+        None,
+        None,
+        PotionItem(20),
+        SwordItem("Épée normal", 25),
+        SwordItem("Excalibur", 999),
+        Enemy("Blind dragon", 200, 0),
+        Enemy("Dragon", 200, 50),
+        Enemy("Gobelin", 15, 5),
+        Enemy("Gobelin", 15, 5)
+    ]
+
+    map.populate(events)  # Place les événements sur la carte
 
 async def handle_move(websocket, direction):
+    """
+    Gère le déplacement du joueur sur la carte en fonction de la direction spécifiée.
+    """
     if player is None:
         await websocket.send(json.dumps({"error": "Le jeu n'a pas été initialisé"}))
         return
 
-    current_position = (0, 0)
-    end_position = (map_size[0] - 1, map_size[1] - 1)
+    current_position = (0, 0)  # Position actuelle du joueur
+    end_position = (map_size[0] - 1, map_size[1] - 1)  # Position finale de la carte
 
+    # Mise à jour de la position en fonction de la direction spécifiée
     if direction == "up" and current_position[0] > 0:
         current_position = (current_position[0] - 1, current_position[1])
     elif direction == "down" and current_position[0] < map_size[0] - 1:
@@ -45,7 +66,7 @@ async def handle_move(websocket, direction):
     elif direction == "right" and current_position[1] < map_size[1] - 1:
         current_position = (current_position[0], current_position[1] + 1)
 
-    event = map.grid[current_position[0]][current_position[1]]
+    event = map.grid[current_position[0]][current_position[1]]  # Événement sur la case actuelle du joueur
 
     if isinstance(event, AbstractItem):
         player.add_item(event)
@@ -56,13 +77,17 @@ async def handle_move(websocket, direction):
     elif event is None:
         message = "Vous avez avancé sans encombre."
 
+    # Vérifie si le joueur a atteint la position finale de la carte sans être mort
     if current_position == end_position and not player.is_dead():
         await websocket.send(json.dumps({"state": WIN, "message": "Victoire !"}))
         return
 
-    await websocket.send(json.dumps( "player": player.__dict__, "message": message, "state": ALIVE))
+    await websocket.send(json.dumps({"player": player.__dict__, "message": message, "state": ALIVE}))
 
 async def handle_event(websocket, action):
+    """
+    Gère les actions du joueur en réponse à un événement rencontré.
+    """
     if player is None:
         await websocket.send(json.dumps({"error": "Le jeu n'a pas été initialisé"}))
         return
@@ -89,6 +114,9 @@ async def handle_event(websocket, action):
         await websocket.send(json.dumps({"state": ALIVE, "message": message}))
 
 async def handler(websocket):
+    """
+    Gestionnaire principal des messages reçus par le serveur WebSocket.
+    """
     async for message in websocket:
         if message == "start":
             initialize_game()
