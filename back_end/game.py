@@ -21,12 +21,13 @@ map_size = None  # Taille de la carte
 map = None  # Instance de la classe Map
 player = None  # Instance de la classe Player
 current_position = None # Position actuelle du joueur
+end_position = None # Position finale de la carte
 
 def initialize_game():
     """
     Initialise le jeu en créant une carte, un joueur et des événements possibles sur la carte.
     """
-    global map_size, map, player, current_position  # Utilise les variables globales
+    global map_size, map, player, current_position, end_position  # Utilise les variables globales
 
     map_size = (10, 10)  # Définit la taille de la carte
     map = Map(map_size[0], map_size[1])  # Crée une instance de la classe Map avec la taille spécifiée
@@ -47,6 +48,7 @@ def initialize_game():
     ]
 
     map.populate(events)  # Place les événements sur la carte
+    end_position = (map_size[0] - 1, map_size[1] - 1)  # Position finale de la carte
 
 async def handle_move(websocket, direction):
     """
@@ -61,8 +63,6 @@ async def handle_move(websocket, direction):
     if player.is_dead():
         await websocket.send(json.dumps({"state": DEAD, "error": "Vous êtes mort"}))
         return
-
-    end_position = (map_size[0] - 1, map_size[1] - 1)  # Position finale de la carte
 
     # Coordonnées du déplacement adjacent
     adjacent_moves = {
@@ -153,7 +153,7 @@ async def handler(websocket):
         if data['action'] == "start":
             initialize_game()
             print('Game initialized')
-            await websocket.send(json.dumps({"player": player.convert_to_dict(), "map": map.convert_to_dict()}))
+            await websocket.send(json.dumps({"player": player.convert_to_dict(), "map": map.convert_to_dict(), "exit": {"line": end_position[0], "column": end_position[1]}}))
         elif data['action'] == "move":
             direction = data["direction"]
             await handle_move(websocket, direction)
