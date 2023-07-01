@@ -48,6 +48,7 @@ class Player(Character):
         """
         if self.agility > enemy.agility:
             return True
+        self.health = 0
         return False
 
     def is_dead(self):

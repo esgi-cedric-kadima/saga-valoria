@@ -11,6 +11,7 @@ from classe.Map import Map
 from classe.Player import Player
 from classe.PotionItem import PotionItem
 from classe.SwordItem import SwordItem
+from classe.Item import AbstractItem
 
 WIN = 2
 ALIVE = 1
@@ -25,7 +26,7 @@ def initializeGame():
     """
     Initialise le jeu en créant une carte, un joueur et des événements possibles sur la carte.
     """
-    global map_size, map, player  # Utilise les variables globales
+    global map_size, map, player, current_position  # Utilise les variables globales
 
     map_size = (10, 10)  # Définit la taille de la carte
     map = Map(map_size[0], map_size[1])  # Crée une instance de la classe Map avec la taille spécifiée
@@ -51,24 +52,48 @@ async def handle_move(websocket, direction):
     """
     Gère le déplacement du joueur sur la carte en fonction de la direction spécifiée.
     """
+    global current_position
+
     if player is None:
         await websocket.send(json.dumps({"error": "Le jeu n'a pas été initialisé"}))
         return
 
+    if player.is_dead():
+        await websocket.send(json.dumps({"state": DEAD, "error": "Vous êtes mort"}))
+        return
+
     end_position = (map_size[0] - 1, map_size[1] - 1)  # Position finale de la carte
 
-    # Mise à jour de la position en fonction de la direction spécifiée
-    if direction == "up" and current_position[0] > 0:
-        current_position = (current_position[0] - 1, current_position[1])
-    elif direction == "down" and current_position[0] < map_size[0] - 1:
-        current_position = (current_position[0] + 1, current_position[1])
-    elif direction == "left" and current_position[1] > 0:
-        current_position = (current_position[0], current_position[1] - 1)
-    elif direction == "right" and current_position[1] < map_size[1] - 1:
-        current_position = (current_position[0], current_position[1] + 1)
+    # Coordonnées du déplacement adjacent
+    adjacent_moves = {
+        "up": (1, 0),
+        "down": (-1, 0),
+        "left": (0, -1),
+        "right": (0, 1)
+    }
+
+    # Vérifie si la direction spécifiée est valide
+    if direction not in adjacent_moves:
+        await websocket.send(json.dumps({"error": "Direction invalide"}))
+        return
+
+    # Coordonnées du déplacement adjacent
+    move = adjacent_moves[direction]
+    new_position = (current_position[0] + move[0], current_position[1] + move[1])
+
+    # Vérifie si la nouvelle position est valide
+    if (
+        new_position[0] < 0
+        or new_position[0] >= map_size[0]
+        or new_position[1] < 0
+        or new_position[1] >= map_size[1]
+    ):
+        await websocket.send(json.dumps({"error": "Déplacement en dehors de la carte"}))
+        return
+
+    current_position = new_position  # Met à jour la position actuelle du joueur
 
     event = map.grid[current_position[0]][current_position[1]]  # Événement sur la case actuelle du joueur
-
     if isinstance(event, AbstractItem):
         player.add_item(event)
         player.use_item(event)
@@ -82,7 +107,6 @@ async def handle_move(websocket, direction):
     if current_position == end_position and not player.is_dead():
         await websocket.send(json.dumps({"state": WIN, "message": "Victoire !"}))
         return
-
     await websocket.send(json.dumps({"player": player.__dict__, "message": message, "state": ALIVE}))
 
 async def handle_event(websocket, action):
@@ -91,6 +115,10 @@ async def handle_event(websocket, action):
     """
     if player is None:
         await websocket.send(json.dumps({"error": "Le jeu n'a pas été initialisé"}))
+        return
+
+    if player.is_dead():
+        await websocket.send(json.dumps({"state": DEAD, "error": "Vous êtes mort"}))
         return
 
     event = map.grid[current_position[0]][current_position[1]]  # Événement sur la case actuelle du joueur
@@ -110,6 +138,8 @@ async def handle_event(websocket, action):
             message = "Vous avez fui " + event.name + " et vous avez survécu."
         else:
             message = "Vous avez fui " + event.name + " mais il vous a tué."
+    print(message)
+    print(player.__dict__)
 
     if(player.is_dead()):
         await websocket.send(json.dumps({"state": DEAD, "message": message}))
@@ -122,7 +152,7 @@ async def handler(websocket):
     """
     async for message in websocket:
         if message == "start":
-            initialize_game()
+            initializeGame()
             print('Game initialized')
             await websocket.send(json.dumps({"player": player.__dict__, "map": map.__dict__}))
         elif message == "move":
