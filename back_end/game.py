@@ -19,6 +19,7 @@ DEAD = 0
 map_size = None  # Taille de la carte
 map = None  # Instance de la classe Map
 player = None  # Instance de la classe Player
+current_position = None # Position actuelle du joueur
 
 def initializeGame():
     """
@@ -29,6 +30,7 @@ def initializeGame():
     map_size = (10, 10)  # Définit la taille de la carte
     map = Map(map_size[0], map_size[1])  # Crée une instance de la classe Map avec la taille spécifiée
     player = Player("Joueur", 100, 10, 10, 10)  # Crée une instance de la classe Player avec des caractéristiques prédéfinies
+    current_position = (0, 0)  # Position actuelle du joueur
 
     # Liste des événements possibles sur la carte
     events = [
@@ -53,7 +55,6 @@ async def handle_move(websocket, direction):
         await websocket.send(json.dumps({"error": "Le jeu n'a pas été initialisé"}))
         return
 
-    current_position = (0, 0)  # Position actuelle du joueur
     end_position = (map_size[0] - 1, map_size[1] - 1)  # Position finale de la carte
 
     # Mise à jour de la position en fonction de la direction spécifiée
@@ -91,6 +92,8 @@ async def handle_event(websocket, action):
     if player is None:
         await websocket.send(json.dumps({"error": "Le jeu n'a pas été initialisé"}))
         return
+
+    event = map.grid[current_position[0]][current_position[1]]  # Événement sur la case actuelle du joueur
 
     if action == "attack":
         if player.attack(event):
