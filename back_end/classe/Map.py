@@ -12,4 +12,7 @@ class Map:
     def populate(self, events):
         for line in range(len(self.grid)):
             for column in range(len(self.grid[line])):
-                self.grid[line][column] = random.choice(events)
+                if line == 0 and column == 0:
+                    self.grid[line][column] = None
+                else:
+                    self.grid[line][column] = random.choice(events)
