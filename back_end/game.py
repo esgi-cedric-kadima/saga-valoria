@@ -138,8 +138,6 @@ async def handle_event(websocket, action):
             message = "Vous avez fui " + event.name + " et vous avez survécu."
         else:
             message = "Vous avez fui " + event.name + " mais il vous a tué."
-    print(message)
-    print(player.__dict__)
 
     if(player.is_dead()):
         await websocket.send(json.dumps({"state": DEAD, "message": message}))
