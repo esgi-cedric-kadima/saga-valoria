@@ -66,10 +66,10 @@ async def handle_move(websocket, direction):
 
     # Coordonnées du déplacement adjacent
     adjacent_moves = {
-        "up": (1, 0),
-        "down": (-1, 0),
-        "left": (0, -1),
-        "right": (0, 1)
+        "up": (0, 1),
+        "down": (0, -1),
+        "left": (-1, 0),
+        "right": (1, 0)
     }
 
     # Vérifie si la direction spécifiée est valide
@@ -106,6 +106,7 @@ async def handle_move(websocket, direction):
     # Vérifie si le joueur a atteint la position finale de la carte sans être mort
     if current_position == end_position and not player.is_dead():
         await websocket.send(json.dumps({"result_move": {"state": WIN, "message": "Victoire !"}}))
+        print("Victoire !")
         return
     await websocket.send(json.dumps({"result_move": {"player": player.convert_to_dict(), "message": message, "state": ALIVE}}))
 
